@@ -1,1 +1,1 @@
-﻿
+﻿await nmgBot.BotMngr.MainAsync();
