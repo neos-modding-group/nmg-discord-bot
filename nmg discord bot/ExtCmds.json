@@ -74,6 +74,19 @@
       ]
     },
     {
+      "Response": "you can hash an artifact with a local tool or a website like https://www.strerr.com/en/sha256_file.html",
+      "SlashCmds": [
+        {
+          "name": "sha256",
+          "desc": "explains how to sha256 has a file"
+        },
+        {
+          "name": "howtoSHA256",
+          "desc": "explains how to sha256 has a file"
+        }
+      ]
+    },
+    {
       "Response": "Our reference Directory Structure is available here: https://github.com/neos-modding-group/NeosModLoader/blob/master/README.md#example-directory-structure",
       "SlashCmds": [
         {
