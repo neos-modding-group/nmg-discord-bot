@@ -1,0 +1,189 @@
+{
+  "Responses": [
+    {
+      "Response": "we have our mod list available at http://neosmodloader.com/mods",
+      "SlashCmds": [
+        {
+          "name": "ModList",
+          "desc": "posts a link to our mod list"
+        }
+      ]
+    },
+    {
+      "Response": "Please post the latest file from your `neosdir/Logs` directory.", //temp example Response   
+      "SlashCmds": [
+        {
+          "name": "Logs",
+          "desc": "explains where to find your neos logs"
+        }
+      ],
+      "MsgCmds": [
+        "<:send_logs:974401006584606810>"
+      ]
+    },
+    {
+      "Response": "Our install guide is available here: https://github.com/neos-modding-group/NeosModLoader/blob/master/README.md#installation",
+      "SlashCmds": [
+        {
+          "name": "Installation",
+          "desc": "posts a link to our install guide"
+        },
+        {
+          "name": "Install",
+          "desc": "posts a link to our install guide"
+        }
+      ]
+    },
+    {
+      "Response": "the source for our mod loader is available here: https://github.com/neos-modding-group/NeosModLoader/",
+      "SlashCmds": [
+        {
+          "name": "nml",
+          "desc": "posts a link to Neos Mod Loader"
+        },
+        {
+          "name": "NeosModLoader",
+          "desc": "posts a link to Neos Mod Loader"
+        }
+      ]
+    },
+    {
+      "Response": "our mod manifest is located here: https://github.com/neos-modding-group/neos-mod-manifest/",
+      "SlashCmds": [
+        {
+          "name": "manifest",
+          "desc": "posts the manifest repo"
+        }
+      ]
+    },
+    {
+      "Response": "Our Standalone install guide is available here: https://github.com/neos-modding-group/NeosModLoader/blob/master/doc/neos_standalone_setup.md",
+      "SlashCmds": [
+        {
+          "name": "Standalone",
+          "desc": "posts a link to our Standalone install guide"
+        },
+        {
+          "name": "StandaloneInstallation",
+          "desc": "posts a link to our Standalone install guide"
+        },
+        {
+          "name": "StandaloneInstall",
+          "desc": "posts a link to our Standalone install guide"
+        }
+      ]
+    },
+    {
+      "Response": "Our reference Directory Structure is available here: https://github.com/neos-modding-group/NeosModLoader/blob/master/README.md#example-directory-structure",
+      "SlashCmds": [
+        {
+          "name": "DirStructure",
+          "desc": "posts a link to our Directory Structure Example"
+        }
+      ]
+    },
+    {
+      "Response": "neos's directories explained here: https://github.com/neos-modding-group/NeosModLoader/blob/master/doc/directories.md'",
+      "SlashCmds": [
+        {
+          "name": "Directories",
+          "desc": "posts a link to our Directory documentation"
+        }
+      ]
+    },
+    {
+      "Response": "our Troubleshooting guide is available here: https://github.com/neos-modding-group/NeosModLoader/blob/master/doc/troubleshooting.md",
+      "SlashCmds": [
+        {
+          "name": "Troubleshooting",
+          "desc": "posts a link to our Troubleshooting guide"
+        }
+      ]
+    },
+    {
+      "Response": "nml's hook is explained here: https://github.com/neos-modding-group/NeosModLoader/blob/master/doc/how_nml_works.md'",
+      "SlashCmds": [
+        {
+          "name": "hook",
+          "desc": "posts a link to our how nml works doc"
+        }
+      ]
+    },
+    {
+      "Response": "our fqa is available here: https://github.com/neos-modding-group/NeosModLoader/blob/master/doc/faq.md",
+      "SlashCmds": [
+        {
+          "name": "fqa",
+          "desc": "posts a link to our fqa"
+        }
+      ]
+    },
+    {
+      "Response": "our linux specific notes are available here: https://github.com/neos-modding-group/NeosModLoader/blob/master/doc/linux.md",
+      "SlashCmds": [
+        {
+          "name": "linux",
+          "desc": "posts a link to our linux notes"
+        }
+      ]
+    },
+    {
+      "Response": "Problem Solving Techniques for neos are described here: https://github.com/neos-modding-group/NeosModLoader/blob/master/doc/problem_solving_techniques.md",
+      "SlashCmds": [
+        {
+          "name": "ProblemSolvingTechniques",
+          "desc": "posts a link to our Problem Solving Techniques doc"
+        },
+        {
+          "name": "PST",
+          "desc": "ProblemSolvingTechniques - posts a link to our Problem Solving Techniques doc"
+        }
+      ]
+    },
+    {
+      "Response": "Neos`s Mod & Plugin Policy is available here: https://wiki.neos.com/Mod_%26_Plugin_Policy",
+      "SlashCmds": [
+        {
+          "name": "ModPluginPolicy",
+          "desc": "posts a link to Neos`s Mod & Plugin Policy"
+        }
+      ]
+    },
+    {
+      "Response": "Neos`s Guidelines are available here: https://wiki.neos.com/Guidelines",
+      "SlashCmds": [
+        {
+          "name": "Guidelines",
+          "desc": "posts a link to Neos`s Guidelines"
+        }
+      ]
+    },
+    {
+      "Response": "Neos`s eula is available here: https://store.steampowered.com//eula/740250_eula_0",
+      "SlashCmds": [
+        {
+          "name": "eula",
+          "desc": "posts a link to Neos`s eula"
+        }
+      ]
+    },
+    {
+      "Response": "Neos`s Terms of Use are available here: https://wiki.neos.com/Terms_of_Use",
+      "SlashCmds": [
+        {
+          "name": "TOU",
+          "desc": "posts a link to Neos`s Terms of Use"
+        }
+      ]
+    },
+    {
+      "Response": "Neos`s Security reporting policy is available here: https://wiki.neos.com/Security",
+      "SlashCmds": [
+        {
+          "name": "Security",
+          "desc": "posts a link to Neos`s reporting policy"
+        }
+      ]
+    }
+  ]
+}
