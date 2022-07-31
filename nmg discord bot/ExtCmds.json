@@ -1,7 +1,7 @@
 {
   "Responses": [
     {
-      "Response": "we have our mod list available at http://neosmodloader.com/mods",
+      "Response": "We have our mod list available at http://neosmodloader.com/mods",
       "SlashCmds": [
         {
           "name": "ModList",
@@ -35,7 +35,7 @@
       ]
     },
     {
-      "Response": "the source for our mod loader is available here: https://github.com/neos-modding-group/NeosModLoader/",
+      "Response": "The source for our mod loader is available here: https://github.com/neos-modding-group/NeosModLoader/",
       "SlashCmds": [
         {
           "name": "nml",
@@ -48,11 +48,24 @@
       ]
     },
     {
-      "Response": "our mod manifest is located here: https://github.com/neos-modding-group/neos-mod-manifest/",
+      "Response": "Our mod manifest is located here: https://github.com/neos-modding-group/neos-mod-manifest/",
       "SlashCmds": [
         {
           "name": "manifest",
           "desc": "posts the manifest repo"
+        }
+      ]
+    },
+    {
+      "Response": "Our mod submission tutorial for the mod manifest is located here: https://www.neosmodloader.com/submission-tutorial.html",
+      "SlashCmds": [
+        {
+          "name": "manifest_submission",
+          "desc": "posts the manifest submission tutorial"
+        },
+        {
+          "name": "submit_mod",
+          "desc": "posts the manifest submission tutorial"
         }
       ]
     },
@@ -74,7 +87,7 @@
       ]
     },
     {
-      "Response": "you can hash an artifact with a local tool or a website like https://www.strerr.com/en/sha256_file.html",
+      "Response": "You can hash an artifact with a local tool or a website like https://www.strerr.com/en/sha256_file.html",
       "SlashCmds": [
         {
           "name": "sha256",
@@ -96,7 +109,7 @@
       ]
     },
     {
-      "Response": "neos's directories explained here: https://github.com/neos-modding-group/NeosModLoader/blob/master/doc/directories.md'",
+      "Response": "Neos's directories explained here: https://github.com/neos-modding-group/NeosModLoader/blob/master/doc/directories.md'",
       "SlashCmds": [
         {
           "name": "Directories",
@@ -105,7 +118,7 @@
       ]
     },
     {
-      "Response": "our Troubleshooting guide is available here: https://github.com/neos-modding-group/NeosModLoader/blob/master/doc/troubleshooting.md",
+      "Response": "Our Troubleshooting guide is available here: https://github.com/neos-modding-group/NeosModLoader/blob/master/doc/troubleshooting.md",
       "SlashCmds": [
         {
           "name": "Troubleshooting",
@@ -114,7 +127,7 @@
       ]
     },
     {
-      "Response": "nml's hook is explained here: https://github.com/neos-modding-group/NeosModLoader/blob/master/doc/how_nml_works.md'",
+      "Response": "NML's hook is explained here: https://github.com/neos-modding-group/NeosModLoader/blob/master/doc/how_nml_works.md'",
       "SlashCmds": [
         {
           "name": "hook",
@@ -123,7 +136,7 @@
       ]
     },
     {
-      "Response": "our FAQ is available here: https://github.com/neos-modding-group/NeosModLoader/blob/master/doc/faq.md",
+      "Response": "Our FAQ is available here: https://github.com/neos-modding-group/NeosModLoader/blob/master/doc/faq.md",
       "SlashCmds": [
         {
           "name": "FAQ",
@@ -132,7 +145,7 @@
       ]
     },
     {
-      "Response": "our linux specific notes are available here: https://github.com/neos-modding-group/NeosModLoader/blob/master/doc/linux.md",
+      "Response": "Our linux specific notes are available here: https://github.com/neos-modding-group/NeosModLoader/blob/master/doc/linux.md",
       "SlashCmds": [
         {
           "name": "linux",
