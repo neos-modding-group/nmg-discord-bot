@@ -131,7 +131,7 @@
       "SlashCmds": [
         {
           "name": "hook",
-          "desc": "posts a link to our how nml works doc"
+          "desc": "posts a link to our how NML works doc"
         }
       ]
     },
@@ -154,7 +154,7 @@
       ]
     },
     {
-      "Response": "Problem Solving Techniques for neos are described here: https://github.com/neos-modding-group/NeosModLoader/blob/master/doc/problem_solving_techniques.md",
+      "Response": "Problem Solving Techniques for Neos are described here: https://github.com/neos-modding-group/NeosModLoader/blob/master/doc/problem_solving_techniques.md",
       "SlashCmds": [
         {
           "name": "ProblemSolvingTechniques",
