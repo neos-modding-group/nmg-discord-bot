@@ -9,7 +9,6 @@ namespace nmgBot
 {
     internal static class ExtCmds //most of this is gross code that works... il fix it later (at least thats what i tell myself)
     {
-        static private jsonFile json;
         static private List<string> responses = new();
         static private Dictionary<SlashCmd, int> slashCmdtoResp = new();
         static private Dictionary<string, int> msgCmdtoResp = new();
@@ -26,6 +25,7 @@ namespace nmgBot
         {
             try
             {
+                jsonFile json;
                 using (StreamReader sr = new StreamReader(Path.Combine(Directory.GetCurrentDirectory(), "ExtCmds.json")))
                 {
                     json = JsonConvert.DeserializeObject<jsonFile>(sr.ReadToEnd());
