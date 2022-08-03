@@ -21,6 +21,25 @@
         "<:send_logs:974401006584606810>"
       ]
     },
+	{
+      "Response": "How to get better fps and quality in Neos and other VR games:
+		**(Before doing this make sure Neos is closed.)**
+
+		https://github.com/fholger/openvr_fsr/releases
+
+		1. Download the latest release zip.
+		2. Go on steam and browse the local files of Neos.
+		3. Navigate to Neos_Data\Plugins\x86_64.
+		4. Find openvr_api.dll and rename it to "openvr_api.orig.dll".
+		5. Extract all the contents of the zip to the folder of the original dll. (The new dll and the config file)
+		6. Turn up your steamvr sample % to like 200% or so.", 
+      "SlashCmds": [
+        {
+          "name": "FSR",
+          "desc": "Explains how to install openvr_fsr."
+        }
+      ]
+    },
     {
       "Response": "Our install guide is available here: https://github.com/neos-modding-group/NeosModLoader/blob/master/README.md#installation",
       "SlashCmds": [
