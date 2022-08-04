@@ -13,7 +13,7 @@ namespace nmgBot
     public class ManifestInfo
     {
         [JsonPropertyName("schemaVersion")]
-        public string SchemaVersion { get; set; }
+        public string schemaVersion { get; set; }
         [JsonPropertyName("mods")]
         public Dictionary<string, ModInfo> mods { get; set; }
 
@@ -39,6 +39,9 @@ namespace nmgBot
 
         [JsonPropertyName("sourceLocation")]
         public string sourceLocation { get; set; }
+        
+        [JsonPropertyName("website")]
+        public string website { get; set; }
 
         [JsonPropertyName("tags")]
         public string[] tags { get; set; }
@@ -80,11 +83,27 @@ namespace nmgBot
         [JsonPropertyName("neosVersionCompatibility")]
         public string neosVersionCompatibility { get; set; }
 
-        //TODO Dependencies
+        [JsonPropertyName("modloaderVersionCompatibility")]
+        public string modloaderVersionCompatibility { get; set; }
+
+        [JsonPropertyName("flagList")]
+        public string[] flagList { get; set; }
+        
+        [JsonPropertyName("conflicts")]
+        public string[] conflicts { get; set; }
+
+        [JsonPropertyName("dependencies")]
+        public Dictionary<string, Dependency> dependencies { get; set; }
 
         //TODO Artifacts
         [JsonPropertyName("artifacts")]
         public Artifact[] artifacts { get; set; }
+    }
+
+    public class Dependency
+    {
+        [JsonPropertyName("version")]
+        public string version { get; set; } //(semver version specifier)
     }
 
     public class Artifact
