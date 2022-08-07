@@ -64,6 +64,7 @@ namespace nmgBot
                 SlashCommandBuilder builder = new();
                 builder.WithName(item.Key.name.ToLower()); // discord requires slash commands name's to be lower case
                 builder.WithDescription(item.Key.desc);
+                builder.AddOption("user_to_ping", ApplicationCommandOptionType.User, "user to ping when sending the msg", false);
                 cmds.Add(builder.Build());
             }
             await BotMngr.client.BulkOverwriteGlobalApplicationCommandsAsync(cmds.ToArray());
@@ -71,8 +72,8 @@ namespace nmgBot
 
         static async Task SlashCommandHandler(SocketSlashCommand command)
         {
-            logWraper.Log($"{command.User.FormatedName()} ran SlashCommand: {command.Data.Name} in {command.Channel.Name} {command.GuildId}");
-            await command.RespondAsync(responses[slashCmdtoResp.First((d) => d.Key.name.ToLower() == command.Data.Name).Value]);
+            logWraper.Log($"{command.User.FormatedName()} ran SlashCommand: {command.Data.Name} in {command.Channel.Name} ({command.Channel.Id}) {command.GuildId}");
+            await command.RespondAsync(((command.Data.Options.Count > 0)?(((IUser)command.Data.Options.First().Value).Mention+Environment.NewLine):"")+responses[slashCmdtoResp.First((d) => d.Key.name.ToLower() == command.Data.Name).Value]);
         }
 
         private static async Task MsgHandler(SocketMessage msg)
