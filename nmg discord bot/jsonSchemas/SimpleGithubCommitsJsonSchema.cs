@@ -2,6 +2,6 @@
 {
     internal class SimpleGithubCommitsJsonSchema
     {
-        string sha;
+        public string sha;
     }
 }

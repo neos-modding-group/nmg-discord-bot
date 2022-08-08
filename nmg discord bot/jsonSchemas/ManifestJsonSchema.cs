@@ -8,10 +8,7 @@
 
         public int Count()
         {
-            if (mods is null)
-            {
-                return 0;
-            }
+            if (mods is null) return 0;
             return mods.Count;
         }
     }

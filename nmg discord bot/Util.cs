@@ -17,10 +17,7 @@ namespace nmgBot
         public static string OptionsToString(this IReadOnlyCollection<IApplicationCommandInteractionDataOption> options)
         {
             string output = "";
-            foreach(var cmd in options)
-            {
-                output += $"[ {cmd.Type} {cmd.Name}:{cmd.Value} {cmd.Options.OptionsToString()}] ";
-            }
+            foreach(var cmd in options) output += $"[ {cmd.Type} {cmd.Name}:{cmd.Value} {cmd.Options.OptionsToString()}] ";
             return output;
         }
         public static ulong? NullableUlongParse(string? u) => u == null ? null : ulong.Parse(u); //there is probably a better way to do this

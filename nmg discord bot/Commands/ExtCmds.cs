@@ -76,14 +76,12 @@ namespace nmgBot.Commands
         static async Task SlashCommandHandler(SocketSlashCommand command)
         {
             KeyValuePair<SlashCmd, int>? cmd = slashCmdtoResp.FirstOrDefault((d) => d.Key.name.ToLower() == command.Data.Name);
-            if (cmd == null)
-                return;
+            if (cmd == null) return;
             IUser? user = (IUser)command.Data.Options.FirstOrDefault((o)=>o.Name=="user_to_ping")?.Value;
             ulong? msgid = null;
             string mtrt = (string)command.Data.Options.FirstOrDefault((o) => o.Name == "msg_to_reply_to")?.Value;
             try
             {
-
                 msgid = Util.NullableUlongParse(mtrt);
             }
             catch(Exception e)
@@ -117,10 +115,7 @@ namespace nmgBot.Commands
                 }
             }
 
-            if(foundStrs.Count == 0)
-            {
-                return;
-            }
+            if(foundStrs.Count == 0) return;
             
             foundStrs.Sort(strCmdSort);
 
