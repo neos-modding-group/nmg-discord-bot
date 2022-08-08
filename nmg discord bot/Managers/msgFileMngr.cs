@@ -1,6 +1,6 @@
 ﻿using Discord.WebSocket;
 
-namespace nmgBot
+namespace nmgBot.Managers
 {
     static internal class msgFileMngr
     {

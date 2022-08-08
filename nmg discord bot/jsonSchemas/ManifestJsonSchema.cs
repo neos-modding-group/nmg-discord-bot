@@ -1,4 +1,4 @@
-﻿namespace nmgBot
+﻿namespace nmgBot.jsonSchemas
 {
     //credit to delta https://github.com/XDelta
     public class ManifestInfo

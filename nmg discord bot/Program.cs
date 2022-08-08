@@ -1,1 +1,3 @@
-﻿await nmgBot.BotMngr.MainAsync();
+﻿using nmgBot.Managers;
+
+await BotMngr.MainAsync();

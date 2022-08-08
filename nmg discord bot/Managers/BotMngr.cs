@@ -1,13 +1,14 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using nmgBot.Commands;
 using System;
 using System.Threading.Tasks;
 
-namespace nmgBot
+namespace nmgBot.Managers
 {
     internal static class BotMngr
     {
-        static internal DiscordSocketClient client = new();
+        static internal readonly DiscordSocketClient client = new();
         public static async Task MainAsync()
         {
             client.Log += async (msg) =>
@@ -21,8 +22,11 @@ namespace nmgBot
             await client.LoginAsync(TokenType.Bot, token);
             await client.StartAsync();
 
+
+            logMngr.SetUp();
             ExtCmds.SetUp();
             msgFileMngr.SetUp();
+            manifestMngr.SetUp();
 
             // Block this task until the program is closed.
             await Task.Delay(-1);
