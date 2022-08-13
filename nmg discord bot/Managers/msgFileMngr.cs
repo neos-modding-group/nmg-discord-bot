@@ -4,12 +4,12 @@ namespace nmgBot.Managers
 {
     static internal class msgFileMngr
     {
-        internal static async void SetUp()
+        internal static void SetUp()
         {
             BotMngr.client.MessageReceived += MsgHandler;
         }
 
-        private static async Task MsgHandler(SocketMessage msg)
+        private static Task MsgHandler(SocketMessage msg)
         {
             foreach (var att in msg.Attachments)
             {
@@ -20,6 +20,7 @@ namespace nmgBot.Managers
                 logWraper.Debug(att.Description);
                 logWraper.Debug(att.ToString());
             }
+            return Task.CompletedTask;
         }
     }
 }

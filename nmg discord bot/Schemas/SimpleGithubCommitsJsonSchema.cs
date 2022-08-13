@@ -1,4 +1,4 @@
-﻿namespace nmgBot.jsonSchemas
+﻿namespace nmgBot.Schemas
 {
     internal class SimpleGithubCommitsJsonSchema
     {

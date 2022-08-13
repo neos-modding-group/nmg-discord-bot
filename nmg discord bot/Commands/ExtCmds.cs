@@ -1,7 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using Newtonsoft.Json;
-using nmgBot.jsonSchemas;
+using nmgBot.Schemas;
 using nmgBot.Managers;
 using System;
 using System.Linq.Expressions;
@@ -75,8 +75,17 @@ namespace nmgBot.Commands
 
         static async Task SlashCommandHandler(SocketSlashCommand command)
         {
-            KeyValuePair<SlashCmd, int>? cmd = slashCmdtoResp.FirstOrDefault((d) => d.Key.name.ToLower() == command.Data.Name);
-            if (cmd == null) return;
+            KeyValuePair<SlashCmd, int> cmd;
+            try
+            {
+                cmd = slashCmdtoResp.First((d) => d.Key.name.ToLower() == command.Data.Name);
+            }
+            catch (Exception e)
+            {
+                if (e.Message == "Sequence contains no matching element") return;
+                logWraper.Error("Exception in getting Resp from slashCmdtoResp", e); //this should only happen if there is something wrong with the predicate
+                return; //retuning as cmd is unassigned
+            }
             IUser? user = (IUser)command.Data.Options.FirstOrDefault((o)=>o.Name=="user_to_ping")?.Value;
             ulong? msgid = null;
             string mtrt = (string)command.Data.Options.FirstOrDefault((o) => o.Name == "msg_to_reply_to")?.Value;
@@ -86,9 +95,9 @@ namespace nmgBot.Commands
             }
             catch(Exception e)
             {
-                logWraper.Error($"error parsing string: {mtrt}");
+                logWraper.Error($"error parsing string: {mtrt}", e);
             }
-            string output = (user != null ? (user.Mention + Environment.NewLine) : "") + responses[cmd.Value.Value];
+            string output = (user != null ? (user.Mention + Environment.NewLine) : "") + responses[cmd.Value];
             if (msgid != null)
             {
                 try
@@ -133,15 +142,11 @@ namespace nmgBot.Commands
                 await message.Channel.SendMessageAsync(msgOutput, messageReference: message.Reference);
             else
                 await message.ReplyAsync(msgOutput); 
-            //await Util.GuildFromId(901126079857692714).ChannelFromId(1003519455344738324).SendMessageAsync("perms test");
         }
         private static int strCmdSort(KeyValuePair<int, int> a, KeyValuePair<int, int> b)
         {
             int ret = a.Key - b.Key; //first sort by index of found str
-            if (ret == 0)
-            {
-                ret = a.Value - b.Value; //secondly sort based on index of reply definition 
-            }
+            if (ret == 0) ret = a.Value - b.Value; //secondly sort based on index of reply definition 
             return ret;
         }
     }
