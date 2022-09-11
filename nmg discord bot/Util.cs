@@ -45,6 +45,5 @@ namespace nmgBot
                 return await client.GetStringAsync("url");
             }
         }
-        public static void EnsureExistance<T>(this ILiteCollection<T> col, string str) { if (!col.Exists("$." + str)) col.Insert(str,????); }
     }
 }
