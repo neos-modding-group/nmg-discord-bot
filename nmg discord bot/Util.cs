@@ -2,7 +2,6 @@
 using nmgBot.Managers;
 using Discord;
 using System.Collections.Generic;
-using LiteDB;
 
 namespace nmgBot
 {
@@ -45,6 +44,5 @@ namespace nmgBot
                 return await client.GetStringAsync("url");
             }
         }
-        public static void EnsureExistance<T>(this ILiteCollection<T> col, string str) { if (!col.Exists("$." + str)) col.Insert(str,????); }
     }
 }
