@@ -44,7 +44,11 @@ namespace nmgBot
 			}
 		}
 
-		public static string LenCap(this string str, int cap) => str.Length > cap ? str.Substring(0, cap) : str;
+		public static string LenCap(this string str, int cap)
+		{
+			if (str == null) return null;
+			return str.Length > cap ? str.Substring(0, cap) : str;
+		}
 
 		public static string ConcatStrs(this IEnumerable<string> strings, string seporator = " ")
 		{

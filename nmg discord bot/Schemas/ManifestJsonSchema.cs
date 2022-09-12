@@ -52,12 +52,50 @@ namespace nmgBot.Schemas
 			return false;
 		}
 		public string id;
+		public string[] allFlags
+		{
+			get
+			{
+				if (allflags == null)
+				{
+					List<string> all = new();
+					if (flags!= null) all.AddRange(flags);
+
+					foreach (var version in versions) if (version.Value.flagList != null) all.AddRange(version.Value.flagList);
+
+					allflags = all.ToArray();
+				}
+				return allflags;
+			}
+		}
+
+		private string[] allflags;
+
+
+		public List<KeyValuePair<string, ModVersion>> sortedVersions
+		{
+			get
+			{
+				if(sortedversions == null)
+				{
+					sortedversions = versions.ToList();
+					sortedversions.Sort(versionSort);
+				}
+				return sortedversions;
+			}
+		}
+		List<KeyValuePair<string, ModVersion>> sortedversions;
+
+		private static int versionSort(KeyValuePair<string, ModVersion> a, KeyValuePair<string, ModVersion> b) => new Version(b.Key).CompareTo(new Version(a.Key));
+		public KeyValuePair<string, ModVersion>? latestVersion => sortedVersions.First();
 	}
 
 	public class Author
 	{
 		public string url { get; set; }
+		public string iconUrl { get; set; }
 	}
+
 	public class ModVersion
 	{
 		public string changelog { get; set; }

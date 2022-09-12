@@ -15,6 +15,6 @@ namespace nmgBot.Managers
 
 
 		private static async Task Client_SelectMenuExecuted(SocketMessageComponent component) =>
-			logWraper.Log($"{component.User.FormatedName()} interacted with MessageComponent CustomId: {component.Data.CustomId} Type: {component.Data.Type} Value: {component.Data.Value} Values: {component.Data.Values.ConcatStrs()} in {component.Channel.Name} ({component.Channel.Id}) {(component.GuildId.HasValue ? Util.GuildNameFromId(component.GuildId.Value) : "")} ({component.GuildId})");
+			logWraper.Log($"{component.User.FormatedName()} interacted with MessageComponent CustomId: {component.Data.CustomId} Type: {component.Data.Type} Value: {component.Data.Value} Values: {component.Data.Values.ConcatStrs()} on {component.Message.Id} in {component.Channel.Name} ({component.Channel.Id}) {(component.GuildId.HasValue ? Util.GuildNameFromId(component.GuildId.Value) : "")} ({component.GuildId})");
 	}
 }
