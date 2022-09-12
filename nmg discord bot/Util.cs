@@ -44,5 +44,18 @@ namespace nmgBot
                 return await client.GetStringAsync(url);
             }
         }
+
+        public static string LenCap(this string str, int cap) => str.Length > cap ? str.Substring(0, cap) : str;
+
+        public static string ConcatStrs(this IEnumerable<string> strings)
+        {
+            string o = "";
+            foreach(string str in strings)
+            {
+                o += str + " ";
+            }
+            if (strings.Count() > 0) o = o.Substring(0, o.Length - 1);
+            return o;
+        }
     }
 }

@@ -5,7 +5,7 @@
     {
         public string schemaVersion { get; set; }
         public Dictionary<string, ModInfo> mods { get; set; }
-
+        
         public int Count()
         {
             if (mods is null) return 0;
@@ -19,15 +19,11 @@
             if (arthor != null) arthor = arthor.ToLower();
             if (catagory != null) catagory = catagory.ToLower();
 
-            var OutMods = new List<ModInfo>();
-            foreach (var mod in mods) // this could be made into some ctrl flow hell and be slightly faster but its not worth it for this, being slower isent really a big deal for this proj, theoretically the compiler could optimise this ¯\_(ツ)_/¯
-            {
-                if ((searchTerm == null || (mod.Key.ToLower().Contains(searchTerm) || mod.Value.name.ToLower().Contains(searchTerm) || mod.Value.tagNamesContains(searchTerm))) &&
-                    (arthor == null || mod.Value.arthorNamesContains(arthor)) &&
-                    (catagory == null || mod.Value.category.ToLower().Contains(catagory)))
-                    OutMods.Add(mod.Value);
-            }
-            return OutMods.ToArray();
+            // this could be made into some ctrl flow hell and be slightly faster but its not worth it for this, being slower isent really a big deal for this proj, theoretically the compiler could optimise this ¯\_(ツ)_/¯
+            return mods.Values.Where((mod) =>
+                    (searchTerm == null || (mod.id.ToLower().Contains(searchTerm) || mod.name.ToLower().Contains(searchTerm) || mod.tagNamesContains(searchTerm))) &&
+                    (arthor == null || mod.arthorNamesContains(arthor)) &&
+                    (catagory == null || mod.category.ToLower().Contains(catagory))).ToArray();
         }
     }
     public class ModInfo
@@ -55,6 +51,7 @@
                 if (tag.ToLower().Contains(str)) return true;
             return false;
         }
+        public string id;
     }
 
     public class Author
