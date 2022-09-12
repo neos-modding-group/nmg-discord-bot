@@ -43,13 +43,12 @@ namespace nmgBot.Commands
 
             var mods = manifestMngr.Manifest.searchMods(SearchTerm, AuthorName, CategoryName);
 
-            string test = "";
+            string test = command.Data.Options.OptionsToString();
             foreach(var mod in mods)
             {
                 test += Environment.NewLine;
                 test += mod.name;
             }
-
 
             await command.RespondAsync(test);
         }
