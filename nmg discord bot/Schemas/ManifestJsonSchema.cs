@@ -11,6 +11,27 @@
             if (mods is null) return 0;
             return mods.Count;
         }
+
+        public ModInfo[] searchMods(string? searchTerm, string? arthor, string? catagory) //this code has weird ctrl flow, maybe il fix it later ¯\_(ツ)_/¯
+        {
+            if (searchTerm == null && arthor == null && catagory == null) return mods.Values.ToArray();
+            if (searchTerm != null) searchTerm = searchTerm.ToLower();
+            if (arthor != null) arthor = arthor.ToLower();
+
+            var OutMods = new List<ModInfo>();
+
+            if (searchTerm == null && arthor != null)
+                foreach (var mod in mods)
+                {
+                    if (mod.Value.arthorNamesContains(arthor)) OutMods.Add(mod.Value);
+                }
+            else if (searchTerm != null)
+                foreach (var mod in mods)
+                {
+                    if (mod.Key.ToLower().Contains(searchTerm) || mod.Value.tagNamesContains(searchTerm) && (arthor == null || mod.Value.arthorNamesContains(arthor))) OutMods.Add(mod.Value);
+                }
+            return OutMods.ToArray();
+        }
     }
     public class ModInfo
     {
@@ -23,6 +44,20 @@
         public string category { get; set; }
         public string[] flags { get; set; }
         public Dictionary<string, ModVersion> versions { get; set; }
+        public bool arthorNamesContains(string str)
+        {
+            if(authors == null) return false;
+            foreach (var author in authors)
+                if (author.Key.ToLower().Contains(str)) return true;
+            return false;
+        }
+        public bool tagNamesContains(string str)
+        {
+            if (tags == null) return false;
+            foreach (var tag in tags)
+                if (tag.ToLower().Contains(str)) return true;
+            return false;
+        }
     }
 
     public class Author

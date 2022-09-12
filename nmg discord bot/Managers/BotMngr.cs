@@ -22,9 +22,10 @@ namespace nmgBot.Managers
             await client.LoginAsync(TokenType.Bot, token);
             await client.StartAsync();
 
+
             logMngr.SetUp();
             ExtCmds.SetUp();
-            msgFileMngr.SetUp();
+            SearchCmd.SetUp();
             manifestMngr.SetUp();
             // Block this task until the program is closed.
             await Task.Delay(-1);

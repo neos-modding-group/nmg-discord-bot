@@ -41,7 +41,7 @@ namespace nmgBot
             using (HttpClient client = new())
             {
                 client.DefaultRequestHeaders.Add("User-Agent", "nmg-discord-bot");
-                return await client.GetStringAsync("url");
+                return await client.GetStringAsync(url);
             }
         }
     }
