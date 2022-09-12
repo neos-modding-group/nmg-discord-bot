@@ -1,6 +1,6 @@
 namespace nmgBot
 {
-    internal class neosLogPaser
-    {
-    }
+	internal class neosLogPaser
+	{
+	}
 }
