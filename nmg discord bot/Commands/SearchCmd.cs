@@ -30,7 +30,7 @@ namespace nmgBot.Commands
             builder.WithDescription("search our modmanifest, no arguments will show all mods");
             builder.AddOption(SearchTermArgName, ApplicationCommandOptionType.String, "what mod names/tags to search for", false);
             builder.AddOption(AuthorArgName, ApplicationCommandOptionType.String, "what author to search within", false);
-            builder.AddOption(CategoryArgName, ApplicationCommandOptionType.String, "what Category to search within", false);
+            builder.AddOption(CategoryArgName, ApplicationCommandOptionType.String, "what Category to search within", false); // maybe this should be converted to a multi choice
             await BotMngr.client.CreateGlobalApplicationCommandAsync(builder.Build());
         }
 

@@ -12,24 +12,21 @@
             return mods.Count;
         }
 
-        public ModInfo[] searchMods(string? searchTerm, string? arthor, string? catagory) //this code has weird ctrl flow, maybe il fix it later ¯\_(ツ)_/¯
+        public ModInfo[] searchMods(string? searchTerm, string? arthor, string? catagory)
         {
             if (searchTerm == null && arthor == null && catagory == null) return mods.Values.ToArray();
             if (searchTerm != null) searchTerm = searchTerm.ToLower();
             if (arthor != null) arthor = arthor.ToLower();
+            if (catagory != null) catagory = catagory.ToLower();
 
             var OutMods = new List<ModInfo>();
-
-            if (searchTerm == null && arthor != null)
-                foreach (var mod in mods)
-                {
-                    if (mod.Value.arthorNamesContains(arthor)) OutMods.Add(mod.Value);
-                }
-            else if (searchTerm != null)
-                foreach (var mod in mods)
-                {
-                    if (mod.Key.ToLower().Contains(searchTerm) || mod.Value.tagNamesContains(searchTerm) && (arthor == null || mod.Value.arthorNamesContains(arthor))) OutMods.Add(mod.Value);
-                }
+            foreach (var mod in mods) // this could be made into some ctrl flow hell and be slightly faster but its not worth it for this, being slower isent really a big deal for this proj, theoretically the compiler could optimise this ¯\_(ツ)_/¯
+            {
+                if ((searchTerm == null || (mod.Key.ToLower().Contains(searchTerm) || mod.Value.name.ToLower().Contains(searchTerm) || mod.Value.tagNamesContains(searchTerm))) &&
+                    (arthor == null || mod.Value.arthorNamesContains(arthor)) &&
+                    (catagory == null || mod.Value.category.ToLower().Contains(catagory)))
+                    OutMods.Add(mod.Value);
+            }
             return OutMods.ToArray();
         }
     }
@@ -46,7 +43,7 @@
         public Dictionary<string, ModVersion> versions { get; set; }
         public bool arthorNamesContains(string str)
         {
-            if(authors == null) return false;
+            if (authors == null) return false;
             foreach (var author in authors)
                 if (author.Key.ToLower().Contains(str)) return true;
             return false;
