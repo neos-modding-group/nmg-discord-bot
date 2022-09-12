@@ -1,3 +1,3 @@
-﻿using nmgBot.Managers;
+using nmgBot.Managers;
 
 await BotMngr.MainAsync();

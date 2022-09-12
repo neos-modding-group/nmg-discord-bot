@@ -1,4 +1,4 @@
-﻿namespace nmgBot.Schemas
+namespace nmgBot.Schemas
 {
 	internal class jsonFile
 	{

@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using nmgBot.Schemas;
 
 namespace nmgBot.Managers
