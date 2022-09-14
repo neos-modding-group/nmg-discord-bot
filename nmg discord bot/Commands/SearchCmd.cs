@@ -43,52 +43,28 @@ namespace nmgBot.Commands
 			var mods = manifestMngr.Manifest.searchMods(SearchTerm, AuthorName, CategoryName);
 
 			//build arguments string
-			string text = "";
-			if (SearchTerm != null) text += "SearchTerm: " + SearchTerm + " ";
-			if (AuthorName != null) text += "AuthorName: " + AuthorName + " ";
-			if (CategoryName != null) text += "CategoryName: " + CategoryName + " ";
+			string args = "";
+			if (SearchTerm != null) args += "SearchTerm: " + SearchTerm + " ";
+			if (AuthorName != null) args += "AuthorName: " + AuthorName + " ";
+			if (CategoryName != null) args += "CategoryName: " + CategoryName + " ";
 
-			if (text == "") text = "no arguments";
+			if (args == "") args = "no arguments";
 
-
-			if (mods.Length == 0)
+			switch (mods.Length)
 			{
-				//inform user there were no results
-				await command.RespondAsync("no mods found in manifest for: " + text);
-				return;
+				case 0:
+					//inform user there were no results
+					await command.RespondAsync("no mods found in manifest for: " + args);
+					return;
+				case 1:
+					await modResult(new idNversion(mods[0]), command);
+					return;
 			}
 
 			SelectMenuBuilder builder = new();
-			builder.WithPlaceholder("select mod to view more info about");
-			builder.WithCustomId("modResults"); // discord requires an id
+			string Postfix = ModDropDown(builder, "modResults", mods, "select mod to view more info about") ? Environment.NewLine + "only showing first 25 results in dropdown" : "";
 
-			//msgs to show users when one of discord's limits has been met
-			string postfix = "";
-			if (mods.Length > 25) postfix = Environment.NewLine + "only showing first 25 results in dropdown";
-
-			string overLen = Environment.NewLine + "result to long to show all names";
-			bool isOverLen = false;
-
-			int i = 0;
-			foreach (var mod in mods)
-			{
-				i++;
-
-				//create msg content
-				string add = Environment.NewLine + mod.name;
-				//ensure staying within discord's limits while leaving room to inform the user that a limit has been met
-				if (!isOverLen && text.Length + add.Length + postfix.Length < (mods.Length == i + 1 ? 2000 : 2000 - (overLen.Length + postfix.Length)))
-					text += add;
-				else
-					isOverLen = true;
-
-				//create dropdown
-				if (i < 25) builder.AddOption(mod.name.LenCap(100), mod.id, mod.description.LenCap(100));
-			}
-
-			//postfix limit passed warning msgs if needed
-			if (isOverLen) text = text + overLen;
-			text += postfix;//this one is second so its closer to the dropdown
+			string text = LimitedModList(mods.Select((m)=>m.name).ToArray(), "result to long to show all names", Postfix.Length) + Postfix;
 
 			await command.RespondAsync(text, components: new ComponentBuilder().WithSelectMenu(builder).Build());
 		}
@@ -103,107 +79,181 @@ namespace nmgBot.Commands
 				case "modVersion":
 					modVersions(Component);
 					break;
+				case "modVersionArtifact":
+					modVersionArtifacts(Component);
+					break;
 			}
 		}
-
-		static async void modResults(SocketMessageComponent Component)
+		
+		static async Task modResults(SocketMessageComponent Component)
 		{
-			string modid = Component.Data.Values.First(); //get value. for some reason SocketMessageComponentData.Value seems to always be blank
+			idNversion idver = new(Component);
+			if (await tryGetMod(Component, idver)) return;
+			modResult(idver, Component);
+		}
 
-			//get mod from local manifest
-			ModInfo mod;
-			manifestMngr.Manifest.mods.TryGetValue(modid, out mod);
-			//inform user if mod is not in the manifest, discord requires a response so may aswell make it useful 
-			if (mod == null)
-			{
-				await Component.RespondAsync($"no mod found for: {modid}{Environment.NewLine}it may have been removed from the manifest. removals dont happen unless the mod has been fully deleted.");
-				return;
-			}
+		static async Task modResult(idNversion idver, IDiscordInteraction interaction)
+		{
 			EmbedBuilder builder = new();
 			//add all the information that always exists
-			builder.WithTitle(mod.name)
-				.WithDescription(mod.description)
-				.WithFooter(mod.id, "https://avatars.githubusercontent.com/u/101987083?s=200&v=4")
-				.WithCurrentTimestamp()
-				.AddField("Category", mod.category)
-				.WithColor(new Color(255, 255, 255));
+			builder.WithTitle(idver.ModInfo.name)
+				.WithDescription(idver.ModInfo.description).WithDefults(idver.value);
 
-			if (mod.authors.Count() == 1)
+
+			if (idver.ModInfo.authors.Count() == 1)
 			{
-				var author = mod.authors.First();
+				var author = idver.ModInfo.authors.First();
 				builder.WithAuthor(author.Key, author.Value.iconUrl, author.Value.url);
 			}
 			else
 			{
 				string authorsStr = "";
-				foreach (var author in mod.authors) authorsStr += $"[{author.Key.Replace(" ", "-")}]({author.Value.url}) ";
+				foreach (var author in idver.ModInfo.authors) authorsStr += $"[{author.Key.Replace(" ", "-")}]({author.Value.url}) ";
 				builder.AddField("authors", authorsStr);
 			}
 
-			if (mod.website != null) builder.WithUrl(mod.website); else if (mod.sourceLocation != null) builder.WithUrl(mod.sourceLocation);
-			if (mod.website != null && mod.sourceLocation != null && mod.website != mod.sourceLocation) builder.AddField("SourceLocation", mod.sourceLocation, inline: true);
+			if (idver.ModInfo.website != null) builder.WithUrl(idver.ModInfo.website); else if (idver.ModInfo.sourceLocation != null) builder.WithUrl(idver.ModInfo.sourceLocation);
+			if (idver.ModInfo.website != null && idver.ModInfo.sourceLocation != null && idver.ModInfo.website != idver.ModInfo.sourceLocation) builder.AddField("SourceLocation", idver.ModInfo.sourceLocation, inline: true);
 
-			if (mod.tags != null && mod.tags.Length > 0) builder.AddField("Tags", mod.tags.ConcatStrs("," + Environment.NewLine));
-			if (mod.flags != null && mod.flags.Length > 0) builder.AddField("Flags", mod.flags.ConcatStrs("," + Environment.NewLine));
-			if (mod.latestVersion.HasValue) builder.AddField("LatestVersion", mod.latestVersion.Value.Key);
+			if (idver.ModInfo.tags != null && idver.ModInfo.tags.Length > 0) builder.AddField("Tags", idver.ModInfo.tags.ConcatStrs("," + Environment.NewLine));
+			if (idver.ModInfo.flags != null && idver.ModInfo.flags.Length > 0) builder.AddField("Flags", idver.ModInfo.flags.ConcatStrs("," + Environment.NewLine));
+			if (idver.ModInfo.latestVersion.HasValue) builder.AddField("LatestVersion", idver.ModInfo.latestVersion.Value.Key);
 
 
-			builder.WithColor(GetColorFromFlags(mod.allFlags, mod?.flags, mod?.latestVersion?.Value.flagList));
+			builder.WithColor(GetColorFromFlags(idver.ModInfo.allFlags, idver.ModInfo?.flags, idver.ModInfo?.latestVersion?.Value.flagList));
 
 
 			SelectMenuBuilder menuBuilder = new();
 			menuBuilder.WithPlaceholder("select mod version to view more info about");
 			menuBuilder.WithCustomId("modVersion"); // discord requires an id
-			menuBuilder.AddOption("LatestVersion", mod.id + "-latest", "show info about the latest version");
+			menuBuilder.AddOption("LatestVersion", idver.ModInfo.id + "-latest", "show info about the latest version");
 
 			int i = 0;
-			foreach (var version in mod.versions) //need to add handeling for over 25 versions
+			foreach (var version in idver.ModInfo.versions) //need to add handeling for over 25 versions
 			{
 				i++;
 
 				//create dropdown
-				if (i < 25) menuBuilder.AddOption(version.Key.LenCap(100), mod.id + "-" + version.Key, version.Value?.changelog.LenCap(100));
+				if (i < 25) menuBuilder.AddOption(version.Key.LenCap(100), idver.ModInfo.id + "-" + version.Key, version.Value?.changelog.LenCap(100));
 			}
 
-
-			await Component.RespondAsync("", embed: builder.Build(), components: new ComponentBuilder().WithSelectMenu(menuBuilder).Build());
+			//implement buttons to: download latest version, download latest version with depencacies, view latest version, view versions 
+			await interaction.RespondAsync("", embed: builder.Build(), components: new ComponentBuilder().WithSelectMenu(menuBuilder).Build());
 		}
-		static async void modVersions(SocketMessageComponent Component)
+		static async Task modVersions(SocketMessageComponent Component)
 		{
-			string value = Component.Data.Values.First();
 
-			string version = value.Split("-").Last();
-			string modid = value.Substring(0, value.Length - version.Length -	1);
+			var idver = GetIdnVersion(Component);
+			if (await tryGetmodAndVersion(Component, idver)) return;
 
-			//get mod from local manifest
-			ModInfo mod;
-			manifestMngr.Manifest.mods.TryGetValue(modid, out mod);
-			//inform user if mod is not in the manifest, discord requires a response so may aswell make it useful 
-			if (mod == null)
-			{
-				await Component.RespondAsync($"no mod found for: {modid}{Environment.NewLine}it may have been removed from the manifest. removals dont happen unless the mod has been fully deleted.");
-				return;
-			}
-
-			ModVersion modVer;
-			if (version == "latest") modVer = mod?.latestVersion.Value.Value;
-			else mod.versions.TryGetValue(version, out modVer);
-			if(modVer == null)
-			{
-				await Component.RespondAsync($"no mod version found for: {value}{Environment.NewLine}it may have been removed from the manifest. removals dont happen unless the mod has been fully deleted.");
-				return;
-			}
 
 			EmbedBuilder builder = new();
 
-			builder.WithTitle($"[{mod.name}/{version}]")
-				.WithDescription(modVer.changelog ?? mod.description)
-				.WithFooter(value, "https://avatars.githubusercontent.com/u/101987083?s=200&v=4")
-				.WithCurrentTimestamp()
-				.WithColor(new Color(255, 255, 255));
-			if(modVer.flagList!= null) { GetColorFromFlags(modVer.flagList, null, null); }
+			builder.WithTitle($"[{idver.ModInfo.name}/{idver.version}]")
+				.WithDescription(idver.ModVer.changelog ?? idver.ModInfo.description)
+				.WithDefults(idver.value);
+
+			if (idver.ModVer.releaseUrl != null) builder.WithUrl(idver.ModVer.releaseUrl);
+
+			if (!string.IsNullOrEmpty(idver.ModVer.neosVersionCompatibility)) builder.AddField("neosVersionCompatibility", idver.ModVer.neosVersionCompatibility);
+			if (idver.ModVer.modloaderVersionCompatibility != null) builder.AddField("modloaderVersionCompatibility", idver.ModVer.modloaderVersionCompatibility);
+
+			if (idver.ModVer.flagList != null) GetColorFromFlags(idver.ModVer.flagList, null, null); else if (idver.ModInfo.flags != null) GetColorFromFlags(idver.ModInfo.flags, null, null);
+			if (idver.ModVer.flagList != null && idver.ModInfo.flags.Length > 0) builder.AddField("Flags", idver.ModVer.flagList.ConcatStrs("," + Environment.NewLine));
+
+			//implement buttons to: downloade version, download version with depencacies, view artifacts, view depencacyes, view conflicts, 
 
 			await Component.RespondAsync("", embed: builder.Build());
+		}
+
+		static async Task modVersionArtifacts(SocketMessageComponent Component)
+		{
+			var idver = GetIdnVersion(Component);
+
+
+			SelectMenuBuilder builder = new();
+			ModDropDown(builder, "versionArtifact", idver.ModVer.artifacts, (v)=>v.filename??v.url.GetLastUrlSection(), (v)=>v.sha256, (v)=>v.installLocation??"");
+
+			await Component.RespondAsync("", components: new ComponentBuilder().WithSelectMenu(builder).Build());
+		}
+
+		static bool ModDropDown(SelectMenuBuilder builder, string customId, ModInfo[] mods, string Placeholder = "", int reservedElements = 0) => ModDropDown(builder, customId, mods, (m) => "", Placeholder, reservedElements); // this is some stupid bs, for some reason doing something like idSlug == null? "" : idSlug(m) throws null ref 
+		static bool ModDropDown(SelectMenuBuilder builder, string customId, ModInfo[] mods, Func<ModInfo, string> idSlug, string Placeholder = "", int reservedElements = 0) => ModDropDown(builder, customId, mods, (m) => m.name, (m) => m.id + idSlug(m), (m) => m.description, Placeholder, reservedElements);
+		static bool ModDropDown<T>(SelectMenuBuilder builder, string customId, IEnumerable<T> mods, Func<T, string> name, Func<T, string> val, Func<T, string> desc = null, string Placeholder = "", int reservedElements = 0)
+		{
+			builder.WithPlaceholder(Placeholder);
+			builder.WithCustomId(customId); // discord requires an id
+			int max = 25 - reservedElements;
+
+			int i = 0;
+
+			foreach (var mod in mods)
+			{
+				i++;
+				//create dropdown
+				if (i < max) builder.AddOption(name(mod).LenCap(100), val(mod), desc(mod).LenCap(100)); else break;
+			}
+			return mods.Count() >= max;
+		}
+		static async Task<bool> tryGetmodAndVersion(SocketMessageComponent component, idNversion idver)
+		{
+			if (await tryGetMod(component, idver)) return true;
+
+			if (idver.version == "latest")
+			{
+				KeyValuePair<string, ModVersion>? latest = idver.ModInfo?.latestVersion;
+				idver.ModVer = latest?.Value;
+				idver.version = latest?.Key;
+			}
+			else idver.ModInfo.versions.TryGetValue(idver.version, out idver.ModVer);
+			if (idver.ModVer == null)
+			{
+				await component.RespondAsync($"no mod version found for: {idver.id}{Environment.NewLine}it may have been removed from the manifest. removals dont happen unless the mod has been fully deleted.");
+				return true;
+			}
+			return false;
+		}
+		static async Task<bool> tryGetMod(SocketMessageComponent component, idNversion idver)
+		{
+			//get mod from local manifest
+			manifestMngr.Manifest.mods.TryGetValue(idver.id, out idver.ModInfo);
+			//inform user if mod is not in the manifest, discord requires a response so may aswell make it useful 
+			if (idver.ModInfo == null)
+			{
+				await component.RespondAsync($"no mod found for: {idver.id}{Environment.NewLine}it may have been removed from the manifest. removals dont happen unless the mod has been fully deleted.");
+				return true;
+			}
+			return false;
+		}
+
+		static string LimitedModList(string[] mods, string overLen, int charsUnderLimit)
+		{
+			overLen = Environment.NewLine + overLen;
+			bool isOverLen = false;
+
+			string text = "";
+
+			int cap = 2000 - (overLen.Length + charsUnderLimit);//define this so its not calulated every loop interation
+			int i = 0;
+			foreach (var mod in mods)
+			{
+				i++;
+				//create msg content
+				string add = Environment.NewLine + mod;
+				//ensure staying within discord's limits while leaving room to inform the user that a limit has been met
+				if (text.Length + add.Length + charsUnderLimit < (mods.Length == i + 1 ? 2000 : cap))
+					text += add;
+				else
+				{
+					isOverLen = true;
+					break;
+				}
+			}
+
+			//postfix limit passed warning msgs if needed
+			if (isOverLen) text = text + overLen;
+
+			return text;
 		}
 
 		private static Color GetColorFromFlags(string[] Allflags, string[]? direct, string[]? latest)
@@ -269,6 +319,40 @@ namespace nmgBot.Commands
 			}
 
 			return new(r, g, b);
+		}
+
+		static idNversion GetIdnVersion(SocketMessageComponent component)
+		{
+			string val = component.Data.Values.First(); //get value. for some reason SocketMessageComponentData.Value seems to always be blank
+			string version = val.Split("-").Last();
+			string modid = val.Substring(0, val.Length - version.Length - 1);
+			return new() { id = modid, version = version , value = val};
+		}
+		class idNversion
+		{
+			public string value;
+			public string id;
+			public string version;
+			public ModInfo ModInfo;
+			public ModVersion ModVer;
+
+			public idNversion() { }
+			public idNversion(ModInfo mod)
+			{
+				setId(mod.id);
+				ModInfo = mod;
+			}
+
+			public idNversion(string id) => setId(id);
+
+			public idNversion(SocketMessageComponent component) => setId(component.Data.Values.First());
+
+			private void setId(string id)
+			{
+				this.id = id;
+				value = id;
+			}
+
 		}
 	}
 }

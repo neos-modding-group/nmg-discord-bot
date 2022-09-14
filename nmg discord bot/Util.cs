@@ -60,5 +60,20 @@ namespace nmgBot
 			if (strings.Count() > 0) o = o.Substring(0, o.Length - seporator.Length);
 			return o;
 		}
+		public static EmbedBuilder WithDefults(this EmbedBuilder builder, string val) => builder.WithFooter(val, "https://avatars.githubusercontent.com/u/101987083?s=200&v=4").WithCurrentTimestamp().WithColor(new Color(255, 255, 255));
+
+		public static string GetLastUrlSection(this string url)
+		{
+			if (url.Last() == '/') url = url.Substring(0, url.Length - 1);
+			for (int i = url.Length - 1; i >= 0; i--)
+			{
+				if (url[i] == '/')
+				{
+					url = url.Substring(i + 1);
+					break;
+				}
+			}
+			return url;
+		}
 	}
 }

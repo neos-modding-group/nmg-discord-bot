@@ -59,7 +59,7 @@ namespace nmgBot.Schemas
 				if (allflags == null)
 				{
 					List<string> all = new();
-					if (flags!= null) all.AddRange(flags);
+					if (flags != null) all.AddRange(flags);
 
 					foreach (var version in versions) if (version.Value.flagList != null) all.AddRange(version.Value.flagList);
 
@@ -76,7 +76,7 @@ namespace nmgBot.Schemas
 		{
 			get
 			{
-				if(sortedversions == null)
+				if (sortedversions == null)
 				{
 					sortedversions = versions.ToList();
 					sortedversions.Sort(versionSort);
@@ -103,7 +103,7 @@ namespace nmgBot.Schemas
 		public string neosVersionCompatibility { get; set; }
 		public string modloaderVersionCompatibility { get; set; }
 		public string[] flagList { get; set; }
-		public string[] conflicts { get; set; }
+		public Dictionary<string, Conflict> conflicts { get; set; }
 		public Dictionary<string, Dependency> dependencies { get; set; }
 		public Artifact[] artifacts { get; set; }
 	}
@@ -111,6 +111,11 @@ namespace nmgBot.Schemas
 	public class Dependency
 	{
 		public string version { get; set; } //(semver version specifier)
+	}
+
+	public class Conflict
+	{
+		public string version { get; set; } //(semver version specifier) * is all versions
 	}
 
 	public class Artifact
