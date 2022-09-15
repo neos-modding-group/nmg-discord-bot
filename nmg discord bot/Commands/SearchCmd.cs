@@ -64,7 +64,7 @@ namespace nmgBot.Commands
 			SelectMenuBuilder builder = new();
 			string Postfix = ModDropDown(builder, "modResults", mods, "select mod to view more info about") ? Environment.NewLine + "only showing first 25 results in dropdown" : "";
 
-			string text = LimitedModList(mods.Select((m)=>m.name).ToArray(), "result to long to show all names", Postfix.Length) + Postfix;
+			string text = args + LimitedModList(mods.Select((m) => m.name).ToArray(), "result to long to show all names", Postfix.Length + args.Length) + Postfix;
 
 			await command.RespondAsync(text, components: new ComponentBuilder().WithSelectMenu(builder).Build());
 		}
@@ -82,9 +82,11 @@ namespace nmgBot.Commands
 				case "modVersionArtifact":
 					modVersionArtifacts(Component);
 					break;
+				case "versionArtifact":
+					break;
 			}
 		}
-		
+
 		static async Task modResults(SocketMessageComponent Component)
 		{
 			idNversion idver = new(Component);
@@ -172,7 +174,7 @@ namespace nmgBot.Commands
 
 
 			SelectMenuBuilder builder = new();
-			ModDropDown(builder, "versionArtifact", idver.ModVer.artifacts, (v)=>v.filename??v.url.GetLastUrlSection(), (v)=>v.sha256, (v)=>v.installLocation??"");
+			ModDropDown(builder, "versionArtifact", idver.ModVer.artifacts, (v) => v.filename ?? v.url.GetLastUrlSection(), (v) => v.sha256, (v) => v.installLocation ?? "");
 
 			await Component.RespondAsync("", components: new ComponentBuilder().WithSelectMenu(builder).Build());
 		}
@@ -321,13 +323,8 @@ namespace nmgBot.Commands
 			return new(r, g, b);
 		}
 
-		static idNversion GetIdnVersion(SocketMessageComponent component)
-		{
-			string val = component.Data.Values.First(); //get value. for some reason SocketMessageComponentData.Value seems to always be blank
-			string version = val.Split("-").Last();
-			string modid = val.Substring(0, val.Length - version.Length - 1);
-			return new() { id = modid, version = version , value = val};
-		}
+		static idNversion GetIdnVersion(SocketMessageComponent component) => new(component, true);
+		
 		class idNversion
 		{
 			public string value;
@@ -345,14 +342,25 @@ namespace nmgBot.Commands
 
 			public idNversion(string id) => setId(id);
 
-			public idNversion(SocketMessageComponent component) => setId(component.Data.Values.First());
+			public idNversion(SocketMessageComponent component, bool Dashed = false)
+			{
+				if (Dashed)
+				{
+					value = component.Data.Values.First(); //get value. for some reason SocketMessageComponentData.Value seems to always be blank
+					version = value.Split("-").Last();
+					id = value.Substring(0, value.Length - version.Length - 1);
+				}
+				else
+				{
+					setId(component.Data.Values.First());
+				}
+			}
 
 			private void setId(string id)
 			{
 				this.id = id;
 				value = id;
 			}
-
 		}
 	}
 }
