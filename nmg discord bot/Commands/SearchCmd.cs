@@ -57,7 +57,7 @@ namespace nmgBot.Commands
 					await command.RespondAsync("no mods found in manifest for: " + args);
 					return;
 				case 1:
-					await modResult(new idNversion(mods[0]), command);
+					await modResult(new idNversion(mods[0]), command, args + Environment.NewLine + "only a single result found. showing single result:");
 					return;
 			}
 
@@ -94,7 +94,7 @@ namespace nmgBot.Commands
 			modResult(idver, Component);
 		}
 
-		static async Task modResult(idNversion idver, IDiscordInteraction interaction)
+		static async Task modResult(idNversion idver, IDiscordInteraction interaction, string msgText = "")
 		{
 			EmbedBuilder builder = new();
 			//add all the information that always exists
@@ -140,9 +140,9 @@ namespace nmgBot.Commands
 			}
 
 			//implement buttons to: download latest version, download latest version with depencacies, view latest version, view versions 
-			await interaction.RespondAsync("", embed: builder.Build(), components: new ComponentBuilder().WithSelectMenu(menuBuilder).Build());
+			await interaction.RespondAsync(msgText, embed: builder.Build(), components: new ComponentBuilder().WithSelectMenu(menuBuilder).Build());
 		}
-		static async Task modVersions(SocketMessageComponent Component)
+		static async Task modVersions(SocketMessageComponent Component, string msgText = "")
 		{
 
 			var idver = GetIdnVersion(Component);
@@ -165,10 +165,10 @@ namespace nmgBot.Commands
 
 			//implement buttons to: downloade version, download version with depencacies, view artifacts, view depencacyes, view conflicts, 
 
-			await Component.RespondAsync("", embed: builder.Build());
+			await Component.RespondAsync(msgText, embed: builder.Build());
 		}
 
-		static async Task modVersionArtifacts(SocketMessageComponent Component)
+		static async Task modVersionArtifacts(SocketMessageComponent Component, string msgText = "")
 		{
 			var idver = GetIdnVersion(Component);
 
@@ -176,7 +176,7 @@ namespace nmgBot.Commands
 			SelectMenuBuilder builder = new();
 			ModDropDown(builder, "versionArtifact", idver.ModVer.artifacts, (v) => v.filename ?? v.url.GetLastUrlSection(), (v) => v.sha256, (v) => v.installLocation ?? "");
 
-			await Component.RespondAsync("", components: new ComponentBuilder().WithSelectMenu(builder).Build());
+			await Component.RespondAsync(msgText, components: new ComponentBuilder().WithSelectMenu(builder).Build());
 		}
 
 		static bool ModDropDown(SelectMenuBuilder builder, string customId, ModInfo[] mods, string Placeholder = "", int reservedElements = 0) => ModDropDown(builder, customId, mods, (m) => "", Placeholder, reservedElements); // this is some stupid bs, for some reason doing something like idSlug == null? "" : idSlug(m) throws null ref 
