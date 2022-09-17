@@ -124,23 +124,29 @@ namespace nmgBot.Commands
 
 			builder.WithColor(GetColorFromFlags(idver.ModInfo.allFlags, idver.ModInfo?.flags, idver.ModInfo?.latestVersion?.Value.flagList));
 
-
-			SelectMenuBuilder menuBuilder = new();
-			menuBuilder.WithPlaceholder("select mod version to view more info about");
-			menuBuilder.WithCustomId("modVersion"); // discord requires an id
-			menuBuilder.AddOption("LatestVersion", idver.ModInfo.id + "-latest", "show info about the latest version");
-
-			int i = 0;
-			foreach (var version in idver.ModInfo.versions) //need to add handeling for over 25 versions
+			//need to add handeling for when there is no mod versions
+			ComponentBuilder buttonBuilder = new();
+			if (idver.ModInfo?.versions != null && idver.ModInfo?.versions.Count > 0)
 			{
-				i++;
-
-				//create dropdown
-				if (i < 25) menuBuilder.AddOption(version.Key.LenCap(100), idver.ModInfo.id + "-" + version.Key, version.Value?.changelog.LenCap(100));
+				buttonBuilder.WithButton("Download Latest", $"Download: {idver.id}-latest");
+				buttonBuilder.WithButton("Download Latest with Dependencies", $"Download+Dependencies: {idver.id}-latest");
+				buttonBuilder.WithButton("View Latest", $"View: {idver.id}-latest");
+				buttonBuilder.WithButton("View Versions", $"ViewVersions: {idver.id}");
 			}
 
-			//implement buttons to: download latest version, download latest version with depencacies, view latest version, view versions 
-			await interaction.RespondAsync("", embed: builder.Build(), components: new ComponentBuilder().WithSelectMenu(menuBuilder).Build());
+			//menuBuilder.WithPlaceholder("select mod version to view more info about");
+			//menuBuilder.WithCustomId("modVersion"); // discord requires an id
+			//menuBuilder.AddOption("LatestVersion", idver.ModInfo.id + "-latest", "show info about the latest version");
+
+			//int i = 0;
+			//foreach (var version in idver.ModInfo.versions) //need to add handeling for over 25 versions
+			//{
+			//	i++;
+
+			//create dropdown
+			//	if (i < 25) menuBuilder.AddOption(version.Key.LenCap(100), idver.ModInfo.id + "-" + version.Key, version.Value?.changelog.LenCap(100));
+			//}
+			await interaction.RespondAsync("", embed: builder.Build(), components: buttonBuilder.Build());
 		}
 		static async Task modVersions(SocketMessageComponent Component)
 		{
@@ -324,7 +330,7 @@ namespace nmgBot.Commands
 		}
 
 		static idNversion GetIdnVersion(SocketMessageComponent component) => new(component, true);
-		
+
 		class idNversion
 		{
 			public string value;
