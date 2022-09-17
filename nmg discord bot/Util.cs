@@ -53,6 +53,7 @@ namespace nmgBot
 		public static string ConcatStrs(this IEnumerable<string> strings, string seporator = " ")
 		{
 			string o = "";
+			if (strings == null) return o;
 			foreach (string str in strings)
 			{
 				o += str + seporator;

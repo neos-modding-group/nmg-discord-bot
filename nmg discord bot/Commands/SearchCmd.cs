@@ -12,6 +12,7 @@ namespace nmgBot.Commands
 			BotMngr.client.Ready += DefineSlashCommands;
 			BotMngr.client.SlashCommandExecuted += SlashCommandHandler;
 			BotMngr.client.SelectMenuExecuted += Client_SelectMenuExecuted;
+			BotMngr.client.ButtonExecuted += Client_ButtonExecuted;
 		}
 
 		const string CmdName = "search";
@@ -87,6 +88,25 @@ namespace nmgBot.Commands
 			}
 		}
 
+		private static async Task Client_ButtonExecuted(SocketMessageComponent Component)
+		{
+			if (Component.Data.CustomId.StartsWith("ViewVersions: "))
+			{
+				idNversion idver = new(Component);
+				if (await tryGetMod(Component, idver)) return;
+				SelectMenuBuilder builder = new();
+				//todo: add handeling for mods with over 24 versions
+				ModDropDown(builder, "modVersion", idver.ModInfo.versions, (v) => v.Key, (v) => idver.id + "-" + v.Key, (v) => v.Value.changelog, "select version to view more info about", 1);
+				builder.AddOption("LatestVersion", idver.ModInfo.id + "-latest", "show info about the latest version");
+				await Component.RespondAsync("", components: new ComponentBuilder().WithSelectMenu(builder).Build());
+			} else if (Component.Data.CustomId.StartsWith("View: "))
+			{
+				var idver = GetIdnVersion(Component);
+				if (await tryGetmodAndVersion(Component, idver)) return;
+				modVersion(idver, Component);
+			}
+		}
+
 		static async Task modResults(SocketMessageComponent Component)
 		{
 			idNversion idver = new(Component);
@@ -130,7 +150,7 @@ namespace nmgBot.Commands
 			{
 				buttonBuilder.WithButton("Download Latest", $"Download: {idver.id}-latest");
 				buttonBuilder.WithButton("Download Latest with Dependencies", $"Download+Dependencies: {idver.id}-latest");
-				buttonBuilder.WithButton("View Latest", $"View: {idver.id}-latest");
+				buttonBuilder.WithButton("View Latest Version", $"View: {idver.id}-latest");
 				buttonBuilder.WithButton("View Versions", $"ViewVersions: {idver.id}");
 			}
 
@@ -153,7 +173,11 @@ namespace nmgBot.Commands
 
 			var idver = GetIdnVersion(Component);
 			if (await tryGetmodAndVersion(Component, idver)) return;
+			modVersion(idver, Component);
+		}
 
+		static async Task modVersion(idNversion idver, SocketMessageComponent Component, string msgText = "")
+		{ 
 
 			EmbedBuilder builder = new();
 
@@ -350,16 +374,18 @@ namespace nmgBot.Commands
 
 			public idNversion(SocketMessageComponent component, bool Dashed = false)
 			{
+				if (component.Data.Type == ComponentType.Button)
+					value = component.Data.CustomId.Substring(component.Data.CustomId.IndexOf(": ") + 2);
+				else
+					value = component.Data.Values.First(); //get value. for some reason SocketMessageComponentData.Value seems to always be blank
+
 				if (Dashed)
 				{
-					value = component.Data.Values.First(); //get value. for some reason SocketMessageComponentData.Value seems to always be blank
 					version = value.Split("-").Last();
 					id = value.Substring(0, value.Length - version.Length - 1);
 				}
 				else
-				{
-					setId(component.Data.Values.First());
-				}
+					id = value;
 			}
 
 			private void setId(string id)
