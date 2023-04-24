@@ -90,20 +90,38 @@ namespace nmgBot.Commands
 
 		private static async Task Client_ButtonExecuted(SocketMessageComponent Component)
 		{
-			if (Component.Data.CustomId.StartsWith("ViewVersions: "))
+			int sep = Component.Data.CustomId.IndexOf(": ") + 2;
+			string arg = Component.Data.CustomId.Substring(sep);
+			string type = Component.Data.CustomId.Substring(0, sep);
+			switch (type)
 			{
-				idNversion idver = new(Component);
-				if (await tryGetMod(Component, idver)) return;
-				SelectMenuBuilder builder = new();
-				//todo: add handeling for mods with over 24 versions
-				ModDropDown(builder, "modVersion", idver.ModInfo.versions, (v) => v.Key, (v) => idver.id + "-" + v.Key, (v) => v.Value.changelog, "select version to view more info about", 1);
-				builder.AddOption("LatestVersion", idver.ModInfo.id + "-latest", "show info about the latest version");
-				await Component.RespondAsync("", components: new ComponentBuilder().WithSelectMenu(builder).Build());
-			} else if (Component.Data.CustomId.StartsWith("View: "))
-			{
-				var idver = GetIdnVersion(Component);
-				if (await tryGetmodAndVersion(Component, idver)) return;
-				modVersion(idver, Component);
+				case "ViewVersions: ":
+					idNversion idver = new(arg);
+					if (await tryGetMod(Component, idver)) return;
+					SelectMenuBuilder builder = new();
+					//todo: add handeling for mods with over 24 versions
+					ModDropDown(builder, "modVersion", idver.ModInfo.versions, (v) => v.Key, (v) => idver.id + "-" + v.Key, (v) => v.Value.changelog, "select version to view more info about", 1);
+					builder.AddOption("LatestVersion", idver.ModInfo.id + "-latest", "show info about the latest version");
+					await Component.RespondAsync("", components: new ComponentBuilder().WithSelectMenu(builder).Build());
+					break;
+				case "View: ":
+					idNversion idverz = new(arg, true); // werid compiler naming bs workaround
+					if (await tryGetmodAndVersion(Component, idverz)) return;
+					await modVersion(idverz, Component);
+					break;
+				case "Download: ":
+					break;
+				case "Download+Dependencies: ":
+					break;
+				case "ViewDependencies: ":
+					break;
+				case "ViewArtifacts: ":
+					idNversion idverzz = new(arg, true);
+					if (await tryGetmodAndVersion(Component, idverzz)) return;
+					await modVersionArtifact(idverzz, Component);
+					break;
+				case "ViewConflicts: ":
+					break;
 			}
 		}
 
@@ -111,7 +129,7 @@ namespace nmgBot.Commands
 		{
 			idNversion idver = new(Component);
 			if (await tryGetMod(Component, idver)) return;
-			modResult(idver, Component);
+			await modResult(idver, Component);
 		}
 
 		static async Task modResult(idNversion idver, IDiscordInteraction interaction, string msgText = "")
@@ -148,36 +166,25 @@ namespace nmgBot.Commands
 			ComponentBuilder buttonBuilder = new();
 			if (idver.ModInfo?.versions != null && idver.ModInfo?.versions.Count > 0)
 			{
-				buttonBuilder.WithButton("Download Latest", $"Download: {idver.id}-latest");
-				buttonBuilder.WithButton("Download Latest with Dependencies", $"Download+Dependencies: {idver.id}-latest");
+				if (idver.ModInfo.latestVersion?.Value.artifacts?.Length > 0)
+				{
+					if (idver.ModInfo.latestVersion?.Value?.dependencies != null && idver.ModInfo.latestVersion?.Value?.dependencies?.Count > 0) buttonBuilder.WithButton("Download Latest with Dependencies", $"Download+Dependencies: {idver.id}-latest");
+					buttonBuilder.WithButton("Download Latest", $"Download: {idver.id}-latest");
+				}
 				buttonBuilder.WithButton("View Latest Version", $"View: {idver.id}-latest");
 				buttonBuilder.WithButton("View Versions", $"ViewVersions: {idver.id}");
 			}
-
-			//menuBuilder.WithPlaceholder("select mod version to view more info about");
-			//menuBuilder.WithCustomId("modVersion"); // discord requires an id
-			//menuBuilder.AddOption("LatestVersion", idver.ModInfo.id + "-latest", "show info about the latest version");
-
-			//int i = 0;
-			//foreach (var version in idver.ModInfo.versions) //need to add handeling for over 25 versions
-			//{
-			//	i++;
-
-			//create dropdown
-			//	if (i < 25) menuBuilder.AddOption(version.Key.LenCap(100), idver.ModInfo.id + "-" + version.Key, version.Value?.changelog.LenCap(100));
-			//}
 			await interaction.RespondAsync(msgText, embed: builder.Build(), components: buttonBuilder.Build());
 		}
 		static async Task modVersions(SocketMessageComponent Component, string msgText = "")
 		{
-
 			var idver = GetIdnVersion(Component);
 			if (await tryGetmodAndVersion(Component, idver)) return;
-			modVersion(idver, Component);
+			await modVersion(idver, Component, msgText);
 		}
 
 		static async Task modVersion(idNversion idver, SocketMessageComponent Component, string msgText = "")
-		{ 
+		{
 
 			EmbedBuilder builder = new();
 
@@ -194,18 +201,24 @@ namespace nmgBot.Commands
 			if (idver.ModVer.flagList != null && idver.ModInfo.flags.Length > 0) builder.AddField("Flags", idver.ModVer.flagList.ConcatStrs("," + Environment.NewLine));
 
 			//implement buttons to: downloade version, download version with depencacies, view artifacts, view depencacyes, view conflicts, 
-
-			await Component.RespondAsync(msgText, embed: builder.Build());
+			ComponentBuilder buttonBuilder = new();
+			if (idver.ModVer.artifacts?.Count() > 0)
+			{
+				if (idver.ModVer?.dependencies != null && idver.ModVer?.dependencies?.Count > 0) buttonBuilder.WithButton("Download with Dependencies", $"Download+Dependencies: {idver.value}");
+				buttonBuilder.WithButton("Download", $"Download: {idver.value}");
+				buttonBuilder.WithButton("View Artifacts", $"ViewArtifacts: {idver.value}");
+			}
+			if (idver.ModVer?.dependencies?.Count > 0) buttonBuilder.WithButton("View Dependencies", $"ViewDependencies: {idver.value}");
+			if (idver.ModVer?.conflicts?.Count > 0) buttonBuilder.WithButton("View Conflicts", $"ViewConflicts: {idver.value}");
+			await Component.RespondAsync(msgText, embed: builder.Build(), components: buttonBuilder.Build());
 		}
 
-		static async Task modVersionArtifacts(SocketMessageComponent Component, string msgText = "")
+		static async Task modVersionArtifacts(SocketMessageComponent Component, string msgText = "") => await modVersionArtifact(GetIdnVersion(Component), Component, msgText);
+
+		static async Task modVersionArtifact(idNversion idver, SocketMessageComponent Component, string msgText = "")
 		{
-			var idver = GetIdnVersion(Component);
-
-
 			SelectMenuBuilder builder = new();
-			ModDropDown(builder, "versionArtifact", idver.ModVer.artifacts, (v) => v.filename ?? v.url.GetLastUrlSection(), (v) => v.sha256, (v) => v.installLocation ?? "");
-
+			ModDropDown(builder, "versionArtifact", idver.ModVer.artifacts, (v) => v.filename ?? v.url.GetLastUrlSection(), (v) => v.sha256, (v) => v.installLocation ?? "/nml_mods");
 			await Component.RespondAsync(msgText, components: new ComponentBuilder().WithSelectMenu(builder).Build());
 		}
 
@@ -213,7 +226,7 @@ namespace nmgBot.Commands
 		static bool ModDropDown(SelectMenuBuilder builder, string customId, ModInfo[] mods, Func<ModInfo, string> idSlug, string Placeholder = "", int reservedElements = 0) => ModDropDown(builder, customId, mods, (m) => m.name, (m) => m.id + idSlug(m), (m) => m.description, Placeholder, reservedElements);
 		static bool ModDropDown<T>(SelectMenuBuilder builder, string customId, IEnumerable<T> mods, Func<T, string> name, Func<T, string> val, Func<T, string> desc = null, string Placeholder = "", int reservedElements = 0)
 		{
-			builder.WithPlaceholder(Placeholder);
+			if(!string.IsNullOrEmpty(Placeholder))builder.WithPlaceholder(Placeholder);
 			builder.WithCustomId(customId); // discord requires an id
 			int max = 25 - reservedElements;
 
@@ -370,15 +383,13 @@ namespace nmgBot.Commands
 				ModInfo = mod;
 			}
 
-			public idNversion(string id) => setId(id);
+			public idNversion(string id, bool Dashed = false) => parceDashed(id, Dashed);
 
-			public idNversion(SocketMessageComponent component, bool Dashed = false)
+			public idNversion(SocketMessageComponent component, bool Dashed = false) => parceDashed(component.Data.Values.First(), Dashed);
+
+			private void parceDashed(string val, bool Dashed)
 			{
-				if (component.Data.Type == ComponentType.Button)
-					value = component.Data.CustomId.Substring(component.Data.CustomId.IndexOf(": ") + 2);
-				else
-					value = component.Data.Values.First(); //get value. for some reason SocketMessageComponentData.Value seems to always be blank
-
+				value = val;
 				if (Dashed)
 				{
 					version = value.Split("-").Last();
